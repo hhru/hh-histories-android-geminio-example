@@ -1,0 +1,53 @@
+requiredParams:
+  name: Paging Adapter
+  description: Create ui item + adapter
+
+widgets:
+  - stringParameter:
+      id: adapterPrefix
+      name: Adapter Prefix
+      help: Name of the Adapter Prefix
+      constraints:
+        - class
+        - nonempty
+        - unique
+      default: Blank
+
+  - stringParameter:
+      id: viewName
+      name: Base ui item
+      help: Base ui item
+      default: view
+
+  - booleanParameter:
+       id: useDataModelName
+       name: Use data model?
+       help: If true, DataModelName will be applied
+       default: false
+
+  - stringParameter:
+      id: dataModelName
+      name: Data model name
+      help: Data model name
+      default: ModelName
+      visibility: ${useDataModelName}
+
+globals:
+  - stringParameter:
+      id: adapterName
+      value: ${adapterPrefix}Adapter
+
+recipe:
+
+  - instantiate:
+      from: root/res/layout/view_layout.xml.ftl
+      to: ${resOut}/layout/${viewName}.xml
+
+  - instantiate:
+      from: root/src/app_package/adapter/Adapter.kt.ftl
+      to: ${srcOut}/adapter/${adapterName}.kt
+
+  - addDependencies:
+      - implementation: Libs.Paging.core
+      - implementation: Libs.Paging.rx
+      - implementation: Libs.Core.recyclerView

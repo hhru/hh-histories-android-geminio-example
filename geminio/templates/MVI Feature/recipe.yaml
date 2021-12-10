@@ -1,0 +1,39 @@
+requiredParams:
+  name: 'MVI Feature'
+  description: Creates ActorReducerFeature
+
+widgets:
+  - stringParameter:
+      id: featurePrefix
+      name: Feature Prefix
+      help: Prefix of the feature
+      constraints:
+        - nonempty
+        - unique
+        - class
+      default: Black
+
+globals:
+  - stringParameter:
+      id: featureName
+      value: ${featurePrefix}Feature
+
+  - stringParameter:
+      id: moduleName
+      value: ${featurePrefix}FeatureModule
+
+recipe:
+  - instantiate:
+      from: root/Feature.kt.ftl
+      to: ${srcOut}/${featureName}.kt
+
+  - instantiate:
+      from: root/di/FeatureModule.kt.ftl
+      to: ${srcOut}/di/${moduleName}.kt
+
+  - addDependencies:
+      - implementation: Libs.Mvi.core
+      - implementation: Libs.Mvi.binder
+      - implementation: Libs.Rx.rxJava
+      - implementation: Libs.Rx.rxAndroid
+      - implementation: Libs.Toothpick.core

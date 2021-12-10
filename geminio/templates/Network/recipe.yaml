@@ -1,0 +1,84 @@
+requiredParams:
+  name: Network
+  description: Creates network layer
+
+widgets:
+  - stringParameter:
+      id: entityPrefix
+      name: Entity Prefix
+      help: Prefix that will be used to create network-layer classes
+      constraints:
+        - class
+        - nonempty
+        - unique
+      default: Entity
+
+globals:
+  - stringParameter:
+      id: networkModelName
+      value: ${entityPrefix}Network
+
+  - stringParameter:
+      id: networkApiName
+      value: ${entityPrefix}HttpApi
+
+  - stringParameter:
+      id: repositoryName
+      value: ${entityPrefix}Repository
+
+  - stringParameter:
+      id: converterName
+      value: ${entityPrefix}NetworkConverter
+
+  - stringParameter:
+      id: apiProviderName
+      value: ${networkApiName}Provider
+
+  - stringParameter:
+      id: moduleName
+      value: ${entityPrefix}DataModule
+
+  - stringParameter:
+      id: modelName
+      value: ${entityPrefix}Model
+
+recipe:
+  - instantiate:
+      from: root/network/api/NetworkApi.kt.ftl
+      to: ${srcOut}/network/api/${networkApiName}.kt
+
+  - instantiate:
+      from: root/repository/Repository.kt.ftl
+      to: ${srcOut}/repository/${repositoryName}.kt
+
+  - instantiate:
+      from: root/network/converter/Converter.kt.ftl
+      to: ${srcOut}/network/converter/${converterName}.kt
+
+  - instantiate:
+      from: root/network/di/ApiProvider.kt.ftl
+      to: ${srcOut}/network/di/${apiProviderName}.kt
+
+  - instantiate:
+      from: root/network/di/DataModule.kt.ftl
+      to: ${srcOut}/network/di/${moduleName}.kt
+
+  - instantiate:
+      from: root/network/model/Model.kt.ftl
+      to: ${srcOut}/network/model/${networkModelName}.kt
+
+  - instantiate:
+      from: root/model/Model.kt.ftl
+      to: ${srcOut}/model/${modelName}.kt
+
+  - addDependencies:
+      - implementation: :core
+      - kapt: Libs.Toothpick.compiler
+      - implementation: Libs.Toothpick.core
+      - implementation: Libs.Network.retrofit
+      - implementation: Libs.Network.retrofitKotlinxConverter
+      - implementation: Libs.Network.gson
+      - implementation: Libs.Rx.rxJava
+
+  - addGradlePlugins:
+      - kotlin-kapt

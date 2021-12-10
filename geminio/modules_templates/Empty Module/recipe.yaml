@@ -1,0 +1,48 @@
+requiredParams:
+  name: Empty Module
+  description: Creates empty module
+
+predefinedFeatures:
+  - enableModuleCreationParams
+
+widgets:
+  - booleanParameter:
+      id: needFeatureStructure
+      name: Generate feature structure?
+      help: Generates root packages
+      default: false
+
+recipe:
+  - mkDirs:
+      - ${srcOut}
+
+  - mkDirs:
+      - ${resOut}:
+          - layout
+          - values
+          - drawable
+
+  - predicate:
+      validIf: ${needFeatureStructure}
+      commands:
+        - mkDirs:
+            - ${srcOut}:
+                - data
+                - feature
+                - presentation
+
+  - instantiate:
+      from: root/gitignore.ftl
+      to: ${rootOut}/.gitignore
+
+  - instantiateAndOpen:
+      from: root/build.gradle.kts.ftl
+      to: ${rootOut}/build.gradle.kts
+
+  - instantiate:
+      from: root/proguard-rules.pro.ftl
+      to: ${rootOut}/proguard-rules.pro
+
+  - instantiate:
+      from: root/src/main/AndroidManifest.xml.ftl
+      to: ${manifestOut}/AndroidManifest.xml

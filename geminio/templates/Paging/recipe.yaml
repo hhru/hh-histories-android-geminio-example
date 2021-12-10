@@ -1,0 +1,45 @@
+requiredParams:
+  name: Paging
+  description: Creates paging layer
+
+widgets:
+  - stringParameter:
+      id: pagingPrefix
+      name: Paging Prefix
+      help: Prefix that will be used to create paging-layer classes
+      constraints:
+        - class
+        - nonempty
+        - unique
+      default: Blank
+
+  - stringParameter:
+      id: modelName
+      name: ModelName
+      constraints:
+        - class
+        - nonempty
+        - unique
+      default: Blank
+
+globals:
+  - stringParameter:
+      id: pagerName
+      value: ${pagingPrefix}Pager
+
+  - stringParameter:
+      id: pagingSourceName
+      value: ${pagingPrefix}PagingSource
+
+recipe:
+  - instantiate:
+      from: root/paging/Pager.kt.ftl
+      to: ${srcOut}/paging/${pagerName}.kt
+
+  - instantiate:
+      from: root/paging/PagingSource.kt.ftl
+      to: ${srcOut}/paging/${pagingSourceName}.kt
+
+  - addDependencies:
+      - implementation: Libs.Paging.core
+      - implementation: Libs.Paging.rx

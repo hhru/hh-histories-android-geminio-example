@@ -1,0 +1,78 @@
+requiredParams:
+  name: Fragment + ViewModel
+  description: Creates Fragment + ViewModel
+
+widgets:
+  - stringParameter:
+      id: fragmentPrefix
+      name: Fragment Prefix
+      help: Prefix of the fragment and other classes to create
+      constraints:
+        - nonempty
+        - unique
+        - class
+      default: Blank
+
+  - booleanParameter:
+      id: useMviViewModel
+      name: Use MviViewModel?
+      help: If true, the MviViewModel will be generated
+      default: false
+
+  - booleanParameter:
+      id: useFeature
+      name: Use Feature?
+      help: If true, the Feature will be applied
+      default: false
+      visibility: ${useMviViewModel}
+
+  - stringParameter:
+      id: featureName
+      name: Feature Name
+      help: Feature Name
+      default: Blank
+      visibility: ${useFeature}
+
+globals:
+  - stringParameter:
+      id: fragmentName
+      value: ${fragmentPrefix}Fragment
+
+  - stringParameter:
+      id: fragmentLayoutResName
+      value: ${fragmentName.fragmentToLayout()}
+
+  - stringParameter:
+      id: viewModelName
+      value: ${fragmentPrefix}ViewModel
+
+recipe:
+  - instantiateAndOpen:
+      from: root/src/app_package/Fragment.kt.ftl
+      to: ${srcOut}/${fragmentName}.kt
+
+  - instantiate:
+      from: root/res/layout/fragment.xml.ftl
+      to: ${resOut}/layout/${fragmentLayoutResName}.xml
+
+  - predicate:
+      validIf: ${useMviViewModel}
+      commands:
+        - instantiate:
+            from: root/src/app_package/viewmodel/ViewModel.kt.ftl
+            to: ${srcOut}/viewmodel/${viewModelName}.kt
+
+  - addDependencies:
+      - implementation: Libs.Core.appCompat
+      - implementation: Libs.Core.recyclerView
+      - kapt: Libs.Toothpick.compiler
+      - implementation: Libs.Toothpick.core
+      - implementation: Libs.Toothpick.smoothieSupport
+
+  - predicate:
+      validIf: ${useMviViewModel}
+      commands:
+        - addDependencies:
+            - implementation: Libs.Mvi.core
+            - implementation: Libs.Mvi.binder
+            - implementation: Libs.Toothpick.viewmodelKtp
